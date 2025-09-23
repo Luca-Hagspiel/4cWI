@@ -1,0 +1,46 @@
+.wrapper{
+    display: flex;
+    justify-content: space-between;
+    margin: 20px;
+    border-style: dashed;
+}
+
+.blue{
+    width: 100px;
+    height: 100px;
+    background-color: blue;
+    margin: 5px;
+    border-style: solid;
+}
+
+.green-out{
+    display: flex;
+}
+
+.green{
+    width: 100px;
+    height: 100px;
+    background-color: green;
+    position: relative;
+    margin: 5px;
+    border-style: solid;
+}
+
+.orange{
+    width: 20px;
+    height: 20px;
+    background-color: orange;
+    position:absolute;
+    bottom: 0;
+}
+
+.purple{
+    width: 100px;
+    height: 100px;
+    background-color: purple;
+    position:absolute;
+    bottom: 1%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-style: solid;
+}
