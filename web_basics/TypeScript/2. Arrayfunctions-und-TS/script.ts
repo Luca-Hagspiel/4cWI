@@ -33,5 +33,5 @@ let hasMinor: boolean = people.some((p: Person): boolean => p.age < 18);
 console.log("some - has minor:", hasMinor);
 
 // 7) every
-let allAdults: boolean = people.every((p: Person): boolean => p.age >= 18);
+const allAdults: boolean = people.every((p: Person): boolean => p.age >= 18);
 console.log("every - all adults:", allAdults);
