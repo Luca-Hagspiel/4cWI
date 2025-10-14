@@ -15,6 +15,10 @@
     // "types": ["node"],
     // and npm install -D @types/node
 
+    "module": "esnext",
+    "moduleResolution": "node",
+    "verbatimModuleSyntax": true,
+
     // Other Outputs
     "sourceMap": true,
     "declaration": true,
