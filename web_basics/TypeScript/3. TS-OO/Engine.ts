@@ -18,7 +18,12 @@ export class Engine {
     getKraftstoffverbrauch():string{ return this.iKraftstoff;}
     getBesitzer():Besitzer{ return this.besitzer; }
 
-    setHersteller():void { this.iHorsepower = 0 }
+    setHersteller():void { this.sHersteller = "" }
     setHorsepower():void { this.iHorsepower = 0 }
     setKraftstoffverbrauch():void { this.iKraftstoff = "" }
+    setBesitzer(besitzer:Besitzer):void {
+        this.besitzer.setVorname(besitzer.getVorname());
+        this.besitzer.setNachname(besitzer.getNachname());
+        this.besitzer.setAlter(besitzer.getAlter());
+    };
 }
