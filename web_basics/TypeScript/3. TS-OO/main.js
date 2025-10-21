@@ -1,0 +1,13 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", {value: true});
+var Engine_1 = require("./Engine");
+var Besitzer_1 = require("./Besitzer");
+var Besitzer1 = new Besitzer_1.Besitzer("Max", "Mustermann", 45);
+var Engine1 = new Engine_1.Engine("VW", 150, "Benzin", Besitzer1);
+console.log(Engine1.getHersteller());
+console.log(Engine1.getHorsepower());
+console.log(Engine1.getKraftstoff());
+console.log(Engine1.getBesitzer());
+var Besitzer2 = new Besitzer_1.Besitzer("Erika", "Mustermann", 38);
+Engine1.setBesitzer(Besitzer2);
+console.log(Engine1.getBesitzer());
