@@ -1,7 +1,7 @@
-import './App.css'
-import Card from "./components/Card.tsx";
-import Button from "./components/Button.tsx";
-import PersonCard from "./components/PersonCard.tsx";
+import '../App.css'
+import Card from "./Components/Card.tsx";
+import Button from "./Components/Button.tsx";
+import PersonCard from "./Components/PersonCard.tsx";
 
 function App() {
 
