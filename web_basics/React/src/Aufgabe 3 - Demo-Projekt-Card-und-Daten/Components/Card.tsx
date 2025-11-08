@@ -5,7 +5,7 @@ export default function Card({name, jobtitle, image}: {name:string, jobtitle:str
                 <p className="font-semibold text-gray-800">{name}</p>
                 <p className="text-gray-500 text-sm">{jobtitle}</p>
             </div>
-            <img src={image} alt={name} className=" object-cover" />
+            <img src={image} alt={name} className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 object-cover rounded-md ml-auto" />
         </div>
 
     );

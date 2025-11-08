@@ -14,7 +14,9 @@ export class Store1 implements API {
 
     findCars(searchText: string): Car[] {
         return this.cars.filter(c =>
+            // @ts-ignore
             c.make.toLowerCase().includes(searchText.toLowerCase()) ||
+            // @ts-ignore
             c.model.toLowerCase().includes(searchText.toLowerCase())
         );
     }
