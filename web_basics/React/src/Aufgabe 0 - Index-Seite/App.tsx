@@ -2,7 +2,6 @@ import React from "react";
 import { Link } from "react-router";
 import { motion } from "framer-motion";
 
-// Aufgaben als Array definieren
 const aufgaben = [
     { path: "/Aufgabe1", name: "Components" },
     { path: "/Aufgabe2", name: "Components & States" },
