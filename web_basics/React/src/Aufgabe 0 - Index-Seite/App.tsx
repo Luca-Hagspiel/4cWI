@@ -12,7 +12,7 @@ const aufgaben = [
 
 const App: React.FC = () => {
     return (
-        <div className="min-h-screen bg-gradient-to-tr from-indigo-100 via-pink-100 to-yellow-100 flex flex-col items-center py-16 px-4">
+        <div className="min-h-screen bg-gradient-to-tr from-blue-200 via-teal-200 to-green-100 flex flex-col items-center py-16 px-4">
             <h1 className="text-5xl font-extrabold text-gray-800 mb-12 tracking-wide drop-shadow-md">
                 Aufgaben Übersicht
             </h1>
@@ -28,7 +28,7 @@ const App: React.FC = () => {
                     >
                         <Link
                             to={aufgabe.path}
-                            className="text-xl font-semibold text-gray-700 hover:text-indigo-600 transition-colors duration-300"
+                            className="text-xl font-semibold text-gray-700 hover:text-teal-600 transition-colors duration-300"
                         >
                             {aufgabe.name}
                         </Link>
