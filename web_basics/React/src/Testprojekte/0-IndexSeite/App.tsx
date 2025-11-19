@@ -3,13 +3,7 @@ import { Link } from "react-router";
 import { motion } from "framer-motion";
 
 const aufgaben = [
-    { path: "/Aufgabe1", name: "Components" },
-    { path: "/Aufgabe2", name: "Components & States" },
-    { path: "/Aufgabe3", name: "Demo Projekt (Card & Daten)" },
-    { path: "/Aufgabe4", name: "Lichtschalter" },
-    { path: "/Aufgabe5", name: "ToDo-Liste" },
-
-    { path: "/Testprojekte/", name: "Testprojekte" },
+    { path: "/Testprojekte/SignUp", name: "SignUp" },
 ];
 
 const App: React.FC = () => {

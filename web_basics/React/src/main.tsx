@@ -11,6 +11,10 @@ import App3 from "./Aufgabe 3 - Demo-Projekt-Card-und-Daten/App.tsx";
 import App4 from "./Aufgabe 4 - Lichtschalter/App.tsx";
 import App5 from "./Aufgabe 5 - ToDo-Liste/App.tsx";
 
+import AppSignUp from "./Testprojekte/1-SignUp-Website/App.tsx";
+import AppTest from "./Testprojekte/0-IndexSeite/App.tsx";
+
+
 
 const router = createBrowserRouter([
     {
@@ -36,6 +40,15 @@ const router = createBrowserRouter([
     {
         path: "/Aufgabe5",
         element: <App5/>,
+    },
+
+    {
+        path: "/Testprojekte",
+        element: <AppTest/>,
+    },
+    {
+        path: "/Testprojekte/SignUp",
+        element: <AppSignUp/>,
     },
 ]);
 
