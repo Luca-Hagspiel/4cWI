@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"node src/Testprojekte/1-SignUp-Website/Components/server.js\" \"vite\"",
+    "dev": "concurrently \"node ./src/Testprojekte/1-SignUp-Website/Components/server.js\" \"vite\"",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
@@ -23,6 +23,8 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.5",
     "@types/node": "^24.6.0",
     "@types/react": "^19.1.16",
     "@types/react-dom": "^19.1.9",

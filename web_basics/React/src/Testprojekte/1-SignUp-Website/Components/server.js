@@ -6,7 +6,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const uri = "mongodb+srv://admin:abcd1234!@testdb.dol9cgm.mongodb.net/?appName=TestDB";
+const uri = "mongodb+srv://admin:admin1234@mongodb.0yop5p5.mongodb.net/?appName=MongoDB";
 const client = new MongoClient(uri);
 const dbName = "TestDB";
 
