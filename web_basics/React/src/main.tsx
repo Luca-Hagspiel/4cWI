@@ -11,45 +11,25 @@ import App3 from "./Aufgabe 3 - Demo-Projekt-Card-und-Daten/App.tsx";
 import App4 from "./Aufgabe 4 - Lichtschalter/App.tsx";
 import App5 from "./Aufgabe 5 - ToDo-Liste/App.tsx";
 
-import AppSignUp from "./Testprojekte/1-SignUp-Website/App.tsx";
 import AppTest from "./Testprojekte/0-IndexSeite/App.tsx";
+import AppSignUp from "./Testprojekte/1-SignUp-Website/App.tsx";
+import SignUp from "./Testprojekte/2-Messenger/SignUp.tsx";
+import SignIn from "./Testprojekte/2-Messenger/SignIn.tsx";
 
 
 
 const router = createBrowserRouter([
-    {
-        path: "/",
-        element: <App/>,
-    },
-    {
-        path: "/Aufgabe1",
-        element: <App1/>,
-    },
-    {
-        path: "/Aufgabe2",
-        element: <App2/>,
-    },
-    {
-        path: "/Aufgabe3",
-        element: <App3/>,
-    },
-    {
-        path: "/Aufgabe4",
-        element: <App4/>,
-    },
-    {
-        path: "/Aufgabe5",
-        element: <App5/>,
-    },
+    { path: "/", element: <App/> },
+    { path: "/Aufgabe1", element: <App1/> },
+    { path: "/Aufgabe2", element: <App2/> },
+    { path: "/Aufgabe3", element: <App3/> },
+    { path: "/Aufgabe4", element: <App4/> },
+    { path: "/Aufgabe5", element: <App5/> },
 
-    {
-        path: "/Testprojekte",
-        element: <AppTest/>,
-    },
-    {
-        path: "/Testprojekte/SignUp",
-        element: <AppSignUp/>,
-    },
+    { path: "/Testprojekte", element: <AppTest/> },
+    { path: "/Testprojekte/1-SignUp", element: <AppSignUp/> },
+    { path: "/Testprojekte/2-SignUp", element: <SignUp/> },
+    { path: "/Testprojekte/2-SignIn", element: <SignIn/> },
 ]);
 
 const root = document.getElementById("root");

@@ -3,17 +3,17 @@ import Inputs from "./Components/Inputs";
 
 export default function App() {
     const [formData, setFormData] = useState({
+        username: "",
         vorname: "",
         nachname: "",
-        email: "",
         passwort: "",
         passwortWiederholen: ""
     });
 
     const [errors, setErrors] = useState({
+        username: "",
         vorname: "",
         nachname: "",
-        email: "",
         passwort: "",
         passwortWiederholen: ""
     });
@@ -26,8 +26,7 @@ export default function App() {
     const validateField = (field: string, value: string) => {
         let error = "";
 
-        if ((field === "vorname" || field === "nachname") && !value) error = "Dieses Feld darf nicht leer sein";
-        if (field === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) error = "Ungültige E-Mail";
+        if ((field === "vorname" || field === "nachname" || field === "username") && !value) error = "Dieses Feld darf nicht leer sein";
         if (field === "passwort" && value.length < 8) error = "Mindestens 8 Zeichen";
         if (field === "passwortWiederholen" && value !== formData.passwort) error = "Passwörter stimmen nicht überein";
 
@@ -51,7 +50,7 @@ export default function App() {
         });
 
         alert("Daten gespeichert!");
-        setFormData({ vorname: "", nachname: "", email: "", passwort: "", passwortWiederholen: "" });
+        setFormData({ vorname: "", nachname: "", username: "", passwort: "", passwortWiederholen: "" });
     };
 
 
@@ -61,9 +60,9 @@ export default function App() {
                 <h1 className="text-3xl font-bold text-center mb-4">Herzlich Willkommen!</h1>
                 <p className="text-center  text-gray-600 mb-8">Bitte füllen Sie die Textfelder aus</p>
 
+                <Inputs type="text" placeholder="Username" value={formData.username} onChange={e => handleChange("username", e.target.value)} error={errors.username} />
                 <Inputs type="text" placeholder="Vorname" value={formData.vorname} onChange={e => handleChange("vorname", e.target.value)} error={errors.vorname} />
                 <Inputs type="text" placeholder="Nachname" value={formData.nachname} onChange={e => handleChange("nachname", e.target.value)} error={errors.nachname} />
-                <Inputs type="email" placeholder="E-Mail Adresse" value={formData.email} onChange={e => handleChange("email", e.target.value)} error={errors.email} />
                 <Inputs type="password" placeholder="Passwort" value={formData.passwort} onChange={e => handleChange("passwort", e.target.value)} error={errors.passwort} />
                 <Inputs type="password" placeholder="Passwort wiederholen" value={formData.passwortWiederholen} onChange={e => handleChange("passwortWiederholen", e.target.value)} error={errors.passwortWiederholen} />
 
