@@ -11,8 +11,8 @@ const Chat = () => {
     const [RoomID, setRoomID] = useState(() => cookies.get("RoomID") || "");
     const [NewMessage, setNewMessage] = useState("");
     const [Message, setMessage] = useState<any[]>([]);
-    const messagesEndRef = useRef(null);
 
+    const messagesEndRef = useRef(null);
     const messageRef = collection(db, "messages");
 
     useEffect(() => {

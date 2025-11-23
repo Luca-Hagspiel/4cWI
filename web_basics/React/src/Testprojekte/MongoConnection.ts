@@ -78,6 +78,19 @@ async function start() {
         }
     });
 
+    //Get Usernames
+    app.get("/api/getUsers", async (_req, res) => {
+        try {
+            const users = await User.find({}, "nutzername");
+            const usernames = users.map(u => u.nutzername);
+            res.json(usernames);
+        } catch (error) {
+            console.error("Error fetching users:", error);
+            res.status(500).json({ error: "Server error" });
+        }
+    });
+
+
     app.listen(3001, () => console.log("Server läuft auf http://localhost:3001"));
 }
 

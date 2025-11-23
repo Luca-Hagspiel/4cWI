@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 
 const aufgaben = [
     { path: "/Testprojekte/1-SignUp", name: "SignUp" },
-    { path: "/Testprojekte/2-SignUp", name: "Messenger (unvollständig)" },
+    { path: "/Testprojekte/2-SignUp", name: "Messenger" },
 ];
 
 const App: React.FC = () => {
