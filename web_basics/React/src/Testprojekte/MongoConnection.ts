@@ -6,6 +6,7 @@ import bcrypt from "bcrypt";
 import admin from "firebase-admin";
 import fs from "fs";
 
+
 admin.initializeApp({
     credential: admin.credential.cert(
         // @ts-ignore
@@ -24,10 +25,9 @@ const UserSchema = new mongoose.Schema({
     nutzername: { type: String, required: true, unique: true },
     vorname: { type: String },
     nachname: { type: String },
-    passwort: { type: String, required: true }
+    passwort: { type: String, required: true },
+    profilbildSource: { type: String },
 });
-
-UserSchema.index({ nutzername: 1 }, { unique: true });
 
 const User = mongoose.model("User", UserSchema);
 
@@ -45,13 +45,13 @@ async function start() {
 
     // Registrierung
     app.post("/api/register/user", async (req, res) => {
-        const { nutzername, vorname, nachname, passwort } = req.body;
+        const { nutzername, vorname, nachname, passwort, profilbildSource } = req.body;
 
         try {
             const exist = await User.findOne({ nutzername });
             if (exist) return res.status(400).json({ message: "exists" });
             const hashedPassword = await bcrypt.hash(passwort, 10);
-            const newUser = new User({ nutzername, vorname, nachname, passwort: hashedPassword });
+            const newUser = new User({ nutzername, vorname, nachname, passwort: hashedPassword, profilbildSource });
             await newUser.save();
             res.json(newUser);
         } catch (err) {
@@ -78,6 +78,30 @@ async function start() {
         }
     });
 
+    //Post neues Profilbild
+    app.post("/api/NewProfileSource", async (req, res) => {
+        const { username, filename } = req.body;
+        const filePath = "/Testprojekte/2-Messenger/uploads/" + filename;
+
+        if (!username || !filename) {
+            return res.status(400).json({ message: "Username oder Dateiname fehlt" });
+        }
+
+        try {
+            const user = await User.findOne({ nutzername: username });
+            if (!user) return res.status(404).json({ message: "User nicht gefunden" });
+
+            user.profilbildSource = filePath;
+            await user.save();
+
+            res.json({ message: "Profilbild erfolgreich aktualisiert", profilbildSource: filePath });
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ message: "Serverfehler" });
+        }
+    });
+
+
     //Get Usernames
     app.get("/api/getUsers", async (_req, res) => {
         try {
@@ -90,7 +114,20 @@ async function start() {
         }
     });
 
+    //Get profilbildSource
+    app.get("/api/profilbildSource/:username", async (req, res) => {
+        const { username } = req.params; // Username aus der URL
 
+        try {
+            const user = await User.findOne({ nutzername: username });
+            if (!user) return res.status(404).json({ message: "User nicht gefunden" });
+
+            res.json({ profilbildSource: user.profilbildSource });
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ message: "Serverfehler" });
+        }
+    });
     app.listen(3001, () => console.log("Server läuft auf http://localhost:3001"));
 }
 

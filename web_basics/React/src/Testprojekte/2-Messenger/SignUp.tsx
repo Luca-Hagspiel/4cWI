@@ -28,7 +28,8 @@ export default function SignUp() {
         vorname: "",
         nachname: "",
         passwort: "",
-        passwortWiederholen: ""
+        passwortWiederholen: "",
+        profilbildSource: "/Testprojekte/2-Messenger/default-profile-picture.png",
     });
 
     const [errors, setErrors] = useState({
@@ -49,11 +50,9 @@ export default function SignUp() {
             console.log(result);
             alert("Benutzer erfolgreich erstellt!");
 
-            // Cookie setzen für Username
-            cookies.set("Username", formData.nutzername, { path: "/", maxAge: 60*60*24 }); // 1 Tag gültig
-            // Falls du AuthToken schon vom Server bekommst, setze ihn ebenfalls:
+            cookies.set("Username", formData.nutzername, { path: "/" });
             if(result.data.token) {
-                cookies.set("AuthToken", result.data.token, { path: "/", maxAge: 60*60*24 });
+                cookies.set("AuthToken", result.data.token, { path: "/" });
             }
 
             navigate("/Testprojekte/2-SignIn");
