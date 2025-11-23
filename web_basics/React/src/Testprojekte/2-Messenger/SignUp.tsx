@@ -48,6 +48,14 @@ export default function SignUp() {
             const result = await axios.post('http://localhost:3001/api/register/user', postFormData);
             console.log(result);
             alert("Benutzer erfolgreich erstellt!");
+
+            // Cookie setzen für Username
+            cookies.set("Username", formData.nutzername, { path: "/", maxAge: 60*60*24 }); // 1 Tag gültig
+            // Falls du AuthToken schon vom Server bekommst, setze ihn ebenfalls:
+            if(result.data.token) {
+                cookies.set("AuthToken", result.data.token, { path: "/", maxAge: 60*60*24 });
+            }
+
             navigate("/Testprojekte/2-SignIn");
         } catch (error: any) {
             console.log(error);

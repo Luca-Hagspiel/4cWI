@@ -1,6 +1,6 @@
 import { signInWithCustomToken } from "firebase/auth";
 import { auth } from "./Components/firebase-config.ts";
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import Inputs from "./Components/Inputs.tsx";
 import axios from "axios";
@@ -11,17 +11,19 @@ const cookies = new Cookies();
 export default function SignIn() {
     const navigate = useNavigate();
 
-    const [formData, setFormData] = useState({nutzername: "", passwort: ""});
-    const [errors, setErrors] = useState({nutzername: "", passwort: ""});
+    const [formData, setFormData] = useState({ nutzername: "", passwort: "" });
+    const [errors, setErrors] = useState({ nutzername: "", passwort: "" });
 
     useEffect(() => {
         const token = cookies.get("AuthToken");
-        if (token) {
+        const username = cookies.get("Username");
+        if (token && username) {
             signInWithCustomToken(auth, token)
                 .then(() => navigate("/Testprojekte/2-ChatApp"))
                 .catch(err => {
                     console.log("Fehler beim automatischen Login:", err);
-                    cookies.remove("AuthToken");
+                    cookies.remove("AuthToken", { path: "/" });
+                    cookies.remove("Username", { path: "/" });
                 });
         }
     }, []);
@@ -33,7 +35,10 @@ export default function SignIn() {
             const result = await axios.post('http://localhost:3001/api/login/user', formData);
             if (result.data.firebaseToken) {
                 await signInWithCustomToken(auth, result.data.firebaseToken);
-                cookies.set("AuthToken", result.data.firebaseToken);
+
+                cookies.set("AuthToken", result.data.firebaseToken, { path: "/", maxAge: 60 * 60 * 24 });
+                cookies.set("Username", formData.nutzername, { path: "/", maxAge: 60 * 60 * 24 });
+
                 navigate("/Testprojekte/2-ChatApp");
             } else {
                 alert(result.data);
