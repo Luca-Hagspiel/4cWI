@@ -3,6 +3,17 @@ import cors from "cors";
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 
+import admin from "firebase-admin";
+import fs from "fs";
+
+admin.initializeApp({
+    credential: admin.credential.cert(
+        // @ts-ignore
+        JSON.parse(fs.readFileSync("./src/Testprojekte/2-Messenger/serviceAccountKey.json"))
+    ),
+});
+
+
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -10,13 +21,13 @@ app.use(express.json());
 const uri = "mongodb+srv://admin:admin1234@mongodb.0yop5p5.mongodb.net/TestDB?retryWrites=true&w=majority";
 
 const UserSchema = new mongoose.Schema({
-    Nutzername: { type: String, required: true, unique: true },
+    nutzername: { type: String, required: true, unique: true },
     vorname: { type: String },
     nachname: { type: String },
     passwort: { type: String, required: true }
 });
 
-UserSchema.index({ Nutzername: 1 }, { unique: true });
+UserSchema.index({ nutzername: 1 }, { unique: true });
 
 const User = mongoose.model("User", UserSchema);
 
@@ -34,13 +45,13 @@ async function start() {
 
     // Registrierung
     app.post("/api/register/user", async (req, res) => {
-        const { Nutzername, vorname, nachname, passwort } = req.body;
+        const { nutzername, vorname, nachname, passwort } = req.body;
 
         try {
-            const exist = await User.findOne({ Nutzername });
-            if (exist) return res.status(400).json({ message: "400" });
+            const exist = await User.findOne({ nutzername });
+            if (exist) return res.status(400).json({ message: "exists" });
             const hashedPassword = await bcrypt.hash(passwort, 10);
-            const newUser = new User({ Nutzername, vorname, nachname, passwort: hashedPassword });
+            const newUser = new User({ nutzername, vorname, nachname, passwort: hashedPassword });
             await newUser.save();
             res.json(newUser);
         } catch (err) {
@@ -51,12 +62,13 @@ async function start() {
 
     // Login
     app.post("/api/login/user", async (req, res) => {
-        const { Nutzername, passwort } = req.body;
+        const { nutzername, passwort } = req.body;
 
         try {
-            const user = await User.findOne({ Nutzername });
+            const user = await User.findOne({ nutzername });
             if (user && await bcrypt.compare(passwort, user.passwort)) {
-                res.json("Success");
+                const firebaseToken = await admin.auth().createCustomToken(user._id.toString());
+                return res.json({ firebaseToken });
             } else {
                 res.status(400).json({ message: "400" });
             }

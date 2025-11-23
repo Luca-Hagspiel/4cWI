@@ -16,13 +16,16 @@
     "bootstrap": "^5.3.8",
     "cors": "^2.8.5",
     "express": "^5.1.0",
+    "firebase": "^12.6.0",
+    "firebase-admin": "^13.6.0",
     "mongodb": "^7.0.0",
     "mongoose": "^8.20.0",
     "motion": "^12.23.24",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-router": "^7.9.6",
-    "tailwindcss": "^4.1.15"
+    "tailwindcss": "^4.1.15",
+    "universal-cookie": "^8.0.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",

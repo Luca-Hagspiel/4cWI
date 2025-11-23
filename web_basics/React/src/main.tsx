@@ -15,6 +15,7 @@ import AppTest from "./Testprojekte/0-IndexSeite/App.tsx";
 import AppSignUp from "./Testprojekte/1-SignUp-Website/App.tsx";
 import SignUp from "./Testprojekte/2-Messenger/SignUp.tsx";
 import SignIn from "./Testprojekte/2-Messenger/SignIn.tsx";
+import ChatApp from "./Testprojekte/2-Messenger/ChatApp.tsx";
 
 
 
@@ -30,6 +31,7 @@ const router = createBrowserRouter([
     { path: "/Testprojekte/1-SignUp", element: <AppSignUp/> },
     { path: "/Testprojekte/2-SignUp", element: <SignUp/> },
     { path: "/Testprojekte/2-SignIn", element: <SignIn/> },
+    { path: "/Testprojekte/2-Chatapp", element: <ChatApp/> },
 ]);
 
 const root = document.getElementById("root");

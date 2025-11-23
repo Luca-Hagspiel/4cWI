@@ -10,15 +10,19 @@ type Props = {
 
 const Inputs = ({ type, placeholder, value, onChange, error }: Props) => {
     return (
-        <div className="mb-2 ml-4">
+        <div className="mb-4 w-full">
             <input
                 type={type}
                 placeholder={placeholder}
                 value={value}
                 onChange={onChange}
-                className={`border w-9/10 pl-3 rounded-md p-2 focus:outline-none focus:ring-2 ${error ? "border-red-500 focus:ring-red-400" : "border-gray-500 focus:ring-blue-500"}`}
+                className={`w-full p-3 rounded-lg transition-colors focus:outline-none focus:ring-2
+                    ${error
+                    ? "bg-gray-800 border border-red-500 text-white placeholder-red-400 focus:ring-red-500"
+                    : "bg-gray-700 border border-gray-600 text-white placeholder-gray-400 focus:ring-purple-500"
+                }`}
             />
-            {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
+            {error && <p className="text-red-500 text-sm mt-1 ml-1">{error}</p>}
         </div>
     );
 };
