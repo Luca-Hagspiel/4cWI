@@ -15,9 +15,10 @@ function ChatApp() {
     const navigate = useNavigate();
 
     const [isAuth, setIsAuth] = useState(false);
-    const [username, setUsername] = useState("");
+    const [username, setUsername] = useState(cookies.get("Username"));
     const [room, setRoom] = useState(() => cookies.get("RoomID") || "");
     const [privateChat, setPrivateChat] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     const [usernameList, setUsernameList] = useState<string[]>([]);
     const [ProfileSourceList, setProfileSourceList] = useState<string[]>([]);
@@ -32,18 +33,13 @@ function ChatApp() {
 
         if (token && storedUsername) {
             signInWithCustomToken(auth, token)
-                .then(() => {
-                    setIsAuth(true);
-                    setUsername(storedUsername);
+                .then(async () => {
+                    const res = await axios.get(`http://localhost:3001/api/getToken/${storedUsername}/${token}`);
+                    res.data.valid ? setIsAuth(true) : setIsAuth(false);
                 })
-                .catch(err => {
-                    console.log("Token ungültig oder abgelaufen:", err);
-                    cookies.remove("AuthToken", { path: "/" });
-                    cookies.remove("Username", { path: "/" });
-                    navigate("/Testprojekte/2-SignIn");
-                });
+                .finally(() => setLoading(false));
         } else {
-            navigate("/Testprojekte/2-SignIn");
+            setLoading(false);
         }
 
         const unsubscribe = onAuthStateChanged(auth, user => {
@@ -57,6 +53,14 @@ function ChatApp() {
 
         return () => unsubscribe();
     }, [navigate]);
+
+    useEffect(() => {
+        if (!loading && !isAuth) {
+            cookies.remove("AuthToken", { path: "/" });
+            cookies.remove("Username", { path: "/" });
+            navigate("/Testprojekte/2-SignIn");
+        }
+    }, [loading, isAuth]);
 
     useEffect(() => {
         const fetchUsers = async () => {

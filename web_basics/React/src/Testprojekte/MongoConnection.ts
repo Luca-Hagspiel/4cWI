@@ -29,6 +29,7 @@ const UserSchema = new mongoose.Schema({
     vorname: { type: String },
     nachname: { type: String },
     passwort: { type: String, required: true },
+    token: { type: String },
     profilbildSource: { type: String },
 });
 
@@ -71,6 +72,8 @@ async function start() {
             const user = await User.findOne({ nutzername });
             if (user && await bcrypt.compare(passwort, user.passwort)) {
                 const firebaseToken = await admin.auth().createCustomToken(user._id.toString());
+                user.token = firebaseToken;
+                await user.save();
                 return res.json({ firebaseToken });
             } else {
                 res.status(400).json({ message: "400" });
@@ -138,6 +141,21 @@ async function start() {
         } catch (err) {
             console.error(err);
             res.status(500).json({ message: "Serverfehler", profilbildSource: defaultProfile });
+        }
+    });
+
+    //Get Token
+    app.get("/api/getToken/:username/:token", async (req, res) => {
+        const { username, token } = req.params;
+        try {
+            const user = await User.findOne({ nutzername: username });
+            if (!user) return res.json({ valid: false });
+
+            const isValid = user.token === token;
+            return res.json({ valid: isValid });
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ message: "Serverfehler" });
         }
     });
 
