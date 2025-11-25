@@ -4,8 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"node ./src/Testprojekte/MongoConnection.ts\"  \"node ./public/Testprojekte/2-Messenger/FileUpload.js\" \"vite\"",
-
+    "dev": "concurrently \"node ./src/Testprojekte/MongoConnection.ts\" \"node ./public/Testprojekte/2-Messenger/FileUpload.js\" \"vite\"",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
@@ -15,6 +14,7 @@
     "axios": "^1.13.2",
     "bcrypt": "^6.0.0",
     "bootstrap": "^5.3.8",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dayjs": "^1.11.19",
     "express": "^5.1.0",

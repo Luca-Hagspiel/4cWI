@@ -16,7 +16,10 @@ admin.initializeApp({
 
 
 const app = express();
-app.use(cors());
+app.use(cors({
+    origin: "http://localhost:5173",
+    credentials: true
+}));
 app.use(express.json());
 
 const uri = "mongodb+srv://admin:admin1234@mongodb.0yop5p5.mongodb.net/TestDB?retryWrites=true&w=majority";
@@ -105,9 +108,14 @@ async function start() {
     //Get Usernames
     app.get("/api/getUsers", async (_req, res) => {
         try {
-            const users = await User.find({}, "nutzername");
-            const usernames = users.map(u => u.nutzername);
-            res.json(usernames);
+            const users = await User.find({}, "nutzername profilbildSource");
+            const userArray = users.map(u => ({
+                username: u.nutzername,
+                profilbildSource: u.profilbildSource,
+            }));
+            userArray.sort((a, b) => a.username.localeCompare(b.username));
+
+            res.json(userArray);
         } catch (error) {
             console.error("Error fetching users:", error);
             res.status(500).json({ error: "Server error" });
@@ -117,17 +125,25 @@ async function start() {
     //Get profilbildSource
     app.get("/api/profilbildSource/:username", async (req, res) => {
         const { username } = req.params; // Username aus der URL
+        const defaultProfile = "/Testprojekte/2-Messenger/default-profile-picture.png";
 
         try {
             const user = await User.findOne({ nutzername: username });
-            if (!user) return res.status(404).json({ message: "User nicht gefunden" });
+            if (!user) {
+                return res.json({ profilbildSource: defaultProfile });
+            }
 
-            res.json({ profilbildSource: user.profilbildSource });
+            const profilbildSource = user.profilbildSource || defaultProfile;
+            res.json({ profilbildSource });
         } catch (err) {
             console.error(err);
-            res.status(500).json({ message: "Serverfehler" });
+            res.status(500).json({ message: "Serverfehler", profilbildSource: defaultProfile });
         }
     });
+
+
+
+
     app.listen(3001, () => console.log("Server läuft auf http://localhost:3001"));
 }
 

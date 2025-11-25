@@ -1,50 +1,87 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router";
-import Chat from "./Components/Chat.tsx";
+import RoomChat from "./Components/RoomChat.tsx";
 import Cookies from "universal-cookie";
 import axios from "axios";
 import Settings from "./Components/Settings";
 import { FiSettings } from "react-icons/fi";
+import PrivateChat from "./Components/PrivateChat.tsx";
+import { auth } from "./Components/firebase-config.ts";
+import { onAuthStateChanged, signInWithCustomToken } from "firebase/auth";
 
 const cookies = new Cookies();
 
 function ChatApp() {
     const navigate = useNavigate();
 
-    const [isAuth, setIsAuth] = useState(() => cookies.get("AuthToken") || null);
-    const [username, setUsername] = useState(() => cookies.get("Username") || "");
+    const [isAuth, setIsAuth] = useState(false);
+    const [username, setUsername] = useState("");
     const [room, setRoom] = useState(() => cookies.get("RoomID") || "");
+    const [privateChat, setPrivateChat] = useState(false);
+
     const [usernameList, setUsernameList] = useState<string[]>([]);
+    const [ProfileSourceList, setProfileSourceList] = useState<string[]>([]);
     const [Count, setCount] = useState(0);
     const [ProfileSource, setProfileSource] = useState("/Testprojekte/2-Messenger/default-profile-picture.png");
 
     const roomInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
-        if (!isAuth || !username) {
+        const token = cookies.get("AuthToken");
+        const storedUsername = cookies.get("Username");
+
+        if (token && storedUsername) {
+            signInWithCustomToken(auth, token)
+                .then(() => {
+                    setIsAuth(true);
+                    setUsername(storedUsername);
+                })
+                .catch(err => {
+                    console.log("Token ungültig oder abgelaufen:", err);
+                    cookies.remove("AuthToken", { path: "/" });
+                    cookies.remove("Username", { path: "/" });
+                    navigate("/Testprojekte/2-SignIn");
+                });
+        } else {
             navigate("/Testprojekte/2-SignIn");
         }
-    }, [isAuth, username, navigate]);
+
+        const unsubscribe = onAuthStateChanged(auth, user => {
+            if (!user) {
+                setIsAuth(false);
+                cookies.remove("AuthToken", { path: "/" });
+                cookies.remove("Username", { path: "/" });
+                navigate("/Testprojekte/2-SignIn");
+            }
+        });
+
+        return () => unsubscribe();
+    }, [navigate]);
 
     useEffect(() => {
         const fetchUsers = async () => {
             try {
-                const result = await axios.get("http://localhost:3001/api/getUsers");
-                const otherUsers = result.data.filter((user: string) => user !== username);
-                setUsernameList(otherUsers);
+                const res = await axios.get("http://localhost:3001/api/getUsers");
+                const users = res.data as { username: string; profilbildSource: string }[];
+                const otherUsers = users.filter(u => u.username !== username);
+                setUsernameList(otherUsers.map(u => u.username));
+                setProfileSourceList(otherUsers.map(u => u.profilbildSource));
             } catch (error) {
-                console.log(error);
+                console.error(error);
             }
         };
-        fetchUsers();
-    }, [username]);
+        if (isAuth) fetchUsers();
+    }, [username, isAuth]);
+
+    useEffect(() => {
+        setPrivateChat(!!cookies.get("To"));
+    }, []);
 
     useEffect(() => {
         if (isAuth) {
             const fetchProfilePicture = async () => {
                 try {
                     const res = await axios.get(`http://localhost:3001/api/profilbildSource/${username}`);
-                    // Überprüfung, ob profilbildSource existiert, sonst Default
                     setProfileSource(res.data.profilbildSource || "/Testprojekte/2-Messenger/default-profile-picture.png");
                 } catch (err) {
                     console.error(err);
@@ -61,7 +98,7 @@ function ChatApp() {
         cookies.remove("AuthToken", { path: "/" });
         cookies.remove("Username", { path: "/" });
         cookies.remove("RoomID", { path: "/" });
-        setIsAuth(null);
+        setIsAuth(false);
         setUsername("");
         setRoom("");
         navigate("/Testprojekte/2-SignIn");
@@ -71,24 +108,40 @@ function ChatApp() {
         if (roomInputRef.current && roomInputRef.current.value.trim() !== "") {
             const newRoom = roomInputRef.current.value.trim();
             setRoom(newRoom);
-            cookies.set("RoomID", newRoom, { path: "/", maxAge: 60 * 30 }); // 30 Min
+            cookies.remove("To", { path: "/" });
+            cookies.set("RoomID", newRoom, { path: "/", maxAge: 60 * 30 });
             roomInputRef.current.value = "";
         }
     };
 
+    const joinPrivate = (user: { user: string }) => {
+        cookies.remove("RoomID", { path: "/" });
+        cookies.set("To", user.user, { path: "/", maxAge: 60 * 30 });
+        setPrivateChat(true);
+        window.location.reload();
+    };
+
     return (
-        <div className="min-h-screen flex bg-gray-800 p-4">
+        <div className="min-full flex bg-gray-800">
             <div className="w-60 bg-gray-800 border-r border-gray-700 p-4 flex flex-col h-screen">
                 <h1 className="text-white text-center mb-4 font-semibold">Alle registrierten User</h1>
                 <div className="flex-1 overflow-y-auto mb-4">
                     <ul>
                         {usernameList.map((user, idx) => (
-                            <li key={idx} className="text-gray-300 mb-1">{user}</li>
+                            <li key={idx} className="text-gray-300 mb-3 hover:text-gray-400">
+                                <button
+                                    className={"flex hover:cursor-pointer"}
+                                    onClick={() => { joinPrivate({ user }) }}
+                                >
+                                    <img className={"size-7 rounded-full mr-2 bg-gray-600 items-center justify-center"} src={ProfileSourceList[idx]} alt="" />
+                                    <p className={"hover:border-b"}>{user}</p>
+                                </button>
+                            </li>
                         ))}
                     </ul>
                 </div>
 
-                <div className="mt-auto mb-4 flex items-center justify-between px-2 border-t border-gray-700 pt-3">
+                <div className="mt-auto flex items-center justify-between px-2 border-t border-gray-700 pt-4">
                     <div className="flex-1 flex items-center">
                         <img
                             className="size-10 rounded-full mr-3"
@@ -111,9 +164,7 @@ function ChatApp() {
             {Count === 0 ? null : <Settings onClose={() => setCount(0)} handleLogout={handleLogout} username={username} />}
 
             <div className="flex-1 flex flex-col items-center justify-center relative">
-                {room ? (
-                    <Chat />
-                ) : (
+                {room ? <RoomChat /> : privateChat ? <PrivateChat /> : (
                     <div className="w-full max-w-md bg-gray-700 rounded-xl shadow-lg p-8 flex flex-col items-center border border-gray-700">
                         <label className="text-gray-300 mb-2 font-medium">Raumnamen eingeben:</label>
                         <input
@@ -132,6 +183,7 @@ function ChatApp() {
             </div>
         </div>
     );
+
 }
 
 export default ChatApp;

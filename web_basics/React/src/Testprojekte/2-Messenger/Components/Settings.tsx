@@ -70,7 +70,6 @@ export default function Settings({ onClose, handleLogout, username }) {
                 <h2 className="text-white text-2xl font-semibold mb-6">Einstellungen</h2>
 
                 <div className="flex flex-col gap-4 text-gray-300">
-                    {/* File Upload */}
                     <input
                         type="file"
                         accept=".png,.jpg,.jpeg,.gif,.webp,.bmp"

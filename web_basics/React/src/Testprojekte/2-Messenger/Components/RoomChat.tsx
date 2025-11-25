@@ -1,29 +1,43 @@
 import { useEffect, useState, useRef } from "react";
-import { addDoc, collection, serverTimestamp, onSnapshot, query, where } from "firebase/firestore";
+import { addDoc, collection, serverTimestamp, onSnapshot, query, orderBy, arrayUnion, updateDoc, doc, setDoc } from "firebase/firestore";
 import { db } from "./firebase-config.ts";
 import Cookies from "universal-cookie";
 import dayjs from "dayjs";
 
 const cookies = new Cookies();
 
-const Chat = () => {
+const RoomChat = () => {
     const [username] = useState(() => cookies.get("Username"));
     const [RoomID, setRoomID] = useState(() => cookies.get("RoomID") || "");
     const [NewMessage, setNewMessage] = useState("");
     const [Message, setMessage] = useState<any[]>([]);
 
     const messagesEndRef = useRef(null);
-    const messageRef = collection(db, "messages");
+    const messageRef = collection(db, "room_collection", `room_${RoomID}`, "messages");
+    const participantsRef = doc(db, "room_collection", `room_${RoomID}`);
 
     useEffect(() => {
-        const queryMessages = query(messageRef, where("room", "==", RoomID));
-        const unsubscribe = onSnapshot(queryMessages, (snapshot) => {
-            const messagesArray: any[] = [];
-            snapshot.docs.forEach(doc => messagesArray.push({ ...doc.data(), id: doc.id }));
-            setMessage(messagesArray);
+        if (!messageRef) return;
+
+        const q = query(messageRef, orderBy("createdAt", "asc"));
+
+        const unsubscribe = onSnapshot(q, snapshot => {
+            const arr = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+            setMessage(arr);
         });
+
         return () => unsubscribe();
-    }, [RoomID]);
+    }, [messageRef]);
+
+    useEffect(() => {
+        setDoc(
+            doc(db, "room_collection", `room_${RoomID}`),
+            {
+                participants: []
+            },
+            { merge: true }
+        );
+    }, []);
 
     useEffect(() => {
         scrollToBottom();
@@ -42,7 +56,10 @@ const Chat = () => {
             text: NewMessage,
             createdAt: serverTimestamp(),
             user: username,
-            room: RoomID,
+            });
+
+        await updateDoc(participantsRef, {
+            participants: arrayUnion(username)
         });
 
         setNewMessage("");
@@ -56,14 +73,14 @@ const Chat = () => {
     };
 
     return (
-        <div className="flex flex-col w-full max-w-5xl h-[80vh] mx-auto bg-gray-300 rounded-xl shadow-xl overflow-hidden">
+        <div className="flex flex-col w-full h-[100vh] mx-auto bg-gray-300 overflow-hidden">
             <div className="flex justify-between items-center p-4 bg-gray-900 border-b border-gray-700 shadow-sm">
-                <span className="text-white font-semibold text-lg">Raum: {RoomID}</span>
+                <span className="text-white font-semibold text-lg">Raum: {RoomID.toUpperCase()}</span>
                 <button
                     onClick={leaveRoom}
                     className="bg-red-600 hover:bg-red-700 text-white font-semibold py-1 px-3 rounded-lg shadow-md transition-colors"
                 >
-                    Raum verlassen
+                    X
                 </button>
             </div>
 
@@ -116,4 +133,4 @@ const Chat = () => {
 
 };
 
-export default Chat;
+export default RoomChat;
