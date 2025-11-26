@@ -6,7 +6,6 @@ import bcrypt from "bcrypt";
 import admin from "firebase-admin";
 import fs from "fs";
 
-
 admin.initializeApp({
     credential: admin.credential.cert(
         // @ts-ignore
@@ -63,6 +62,33 @@ async function start() {
             res.status(500).json({ message: "Serverfehler" });
         }
     });
+
+// POST Room Profilbilder
+    app.post("/api/participantsProfiles", async (req, res) => {
+        const { users } = req.body;
+
+        if (!users || !Array.isArray(users)) {
+            return res.status(400).json({ error: "users muss ein Array sein" });
+        }
+
+        try {
+            const result = await Promise.all(
+                users.map(async (username) => {
+                    const user = await User.findOne({ nutzername: username });
+                    return {
+                        username,
+                        profilbildSource: user?.profilbildSource || "/Testprojekte/2-Messenger/default-profile-picture.png"
+                    };
+                })
+            );
+
+            res.json({ users: result });
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ error: "Serverfehler" });
+        }
+    });
+
 
     // Login
     app.post("/api/login/user", async (req, res) => {

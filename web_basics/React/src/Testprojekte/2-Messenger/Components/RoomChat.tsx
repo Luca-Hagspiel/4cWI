@@ -1,8 +1,9 @@
 import { useEffect, useState, useRef } from "react";
-import { addDoc, collection, serverTimestamp, onSnapshot, query, orderBy, arrayUnion, updateDoc, doc, setDoc } from "firebase/firestore";
+import { addDoc, collection, serverTimestamp, onSnapshot, query, orderBy, arrayUnion, updateDoc, doc, setDoc, getDoc } from "firebase/firestore";
 import { db } from "./firebase-config.ts";
 import Cookies from "universal-cookie";
 import dayjs from "dayjs";
+import axios from "axios";
 
 const cookies = new Cookies();
 
@@ -11,37 +12,85 @@ const RoomChat = () => {
     const [RoomID, setRoomID] = useState(() => cookies.get("RoomID") || "");
     const [NewMessage, setNewMessage] = useState("");
     const [Message, setMessage] = useState<any[]>([]);
+    const [UserList, setUserList] = useState<any[]>([])
+    const [ProfileSourceMe, setProfileSourceMe] = useState("");
+    const [ProfileSourceRest, setProfileSourceRest] = useState();
+
 
     const messagesEndRef = useRef(null);
     const messageRef = collection(db, "room_collection", `room_${RoomID}`, "messages");
     const participantsRef = doc(db, "room_collection", `room_${RoomID}`);
 
     useEffect(() => {
-        if (!messageRef) return;
+        const unsubscribeMessages = onSnapshot(
+            query(messageRef, orderBy("createdAt", "asc")),
+            snapshot => {
+                const arr = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+                setMessage(arr);
+            }
+        );
 
-        const q = query(messageRef, orderBy("createdAt", "asc"));
+        const unsubscribeUsers = onSnapshot(participantsRef, snapshot => {
+            const data = snapshot.data();
+            const newList = data?.participants || [];
 
-        const unsubscribe = onSnapshot(q, snapshot => {
-            const arr = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
-            setMessage(arr);
+            setUserList(prev => {
+                const same =
+                    JSON.stringify(prev) === JSON.stringify(newList);
+                if (!same) return newList;
+                return prev;
+            });
         });
 
-        return () => unsubscribe();
-    }, [messageRef]);
+        return () => {
+            unsubscribeMessages();
+            unsubscribeUsers();
+        };
+    }, [RoomID]);
+
 
     useEffect(() => {
-        setDoc(
-            doc(db, "room_collection", `room_${RoomID}`),
-            {
-                participants: []
-            },
-            { merge: true }
-        );
-    }, []);
+        const checkRoom = async () => {
+            if (!RoomID) return;
+
+            const roomDocRef = doc(db, "room_collection", `room_${RoomID}`);
+            const roomSnap = await getDoc(roomDocRef);
+
+            if (!roomSnap.exists()) {
+                await setDoc(roomDocRef, {
+                    participants: [],
+                    createdAt: serverTimestamp(),
+                });
+            }
+        };
+        checkRoom();
+    }, [RoomID]);
 
     useEffect(() => {
         scrollToBottom();
     }, [Message]);
+
+    useEffect(() => {
+        const fetchProfiles = async () => {
+            try {
+                const resMe = await axios.get(`http://localhost:3001/api/profilbildSource/${username}`);
+                const newMe = resMe.data.profilbildSource || "/Testprojekte/2-Messenger/default-profile-picture.png";
+                setProfileSourceMe(newMe);
+
+                const res = await axios.post(
+                    `http://localhost:3001/api/participantsProfiles`,
+                    { users: UserList }
+                );
+                setProfileSourceRest(res.data.users);
+
+
+            } catch (err) {
+                console.error(err);
+            }
+        };
+
+        fetchProfiles();
+    }, [UserList]);
 
     const scrollToBottom = () => {
         //@ts-ignore
@@ -85,26 +134,48 @@ const RoomChat = () => {
             </div>
 
             <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-800
-            scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-700
-            scrollbar-thumb-rounded-full scrollbar-track-rounded-full"
+        scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-700
+        scrollbar-thumb-rounded-full scrollbar-track-rounded-full"
             >
                 {Message.map((message) => {
                     const isOwn = message.user === username;
+
+                    // @ts-ignore
+                    const userProfile = ProfileSourceRest?.find((p: { username: any; }) => p.username === message.user);
+                    const profileSrc = userProfile?.profilbildSource
+                        || "/Testprojekte/2-Messenger/default-profile-picture.png";
+
                     return (
                         <div key={message.id} className={`flex ${isOwn ? "justify-end" : "justify-start"}`}>
                             <div className={`flex ${isOwn ? "flex-row-reverse" : "flex-row"} items-start space-x-2 ${isOwn ? "space-x-reverse" : ""}`}>
-                                <div className="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center text-white font-bold">
-                                    {message.user[0].toUpperCase()}
-                                </div>
+                                <img
+                                    src={isOwn ? ProfileSourceMe : profileSrc}
+                                    alt="profile"
+                                    className="w-8 h-8 rounded-full object-cover"
+                                />
 
                                 <div className={`flex flex-col max-w-[80%]`}>
-                                    {!isOwn && <span className="text-sm font-semibold text-white">{message.user}</span>}
-                                    <div className={`mt-1 p-3 break-words rounded-2xl shadow-md
-                                    ${isOwn ? "bg-purple-600 text-white rounded-br-none" : "bg-gray-700 text-gray-100 rounded-bl-none"}`}>
+                                    {!isOwn && (
+                                        <span className="text-sm font-semibold text-white">
+                                        {message.user}
+                                    </span>
+                                    )}
+
+                                    <div
+                                        className={`mt-1 p-3 break-words rounded-2xl shadow-md
+                                    ${
+                                            isOwn
+                                                ? "bg-purple-600 text-white rounded-br-none"
+                                                : "bg-gray-700 text-gray-100 rounded-bl-none"
+                                        }`}
+                                    >
                                         {message.text}
                                     </div>
+
                                     <span className="text-xs text-gray-400 mt-1 self-end">
-                                    {message.createdAt?.seconds ? dayjs(message.createdAt.seconds * 1000).format("HH:mm") : ""}
+                                    {message.createdAt?.seconds
+                                        ? dayjs(message.createdAt.seconds * 1000).format("HH:mm")
+                                        : ""}
                                 </span>
                                 </div>
                             </div>
@@ -130,7 +201,6 @@ const RoomChat = () => {
             </form>
         </div>
     );
-
 };
 
 export default RoomChat;
