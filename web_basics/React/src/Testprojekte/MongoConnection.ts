@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
+import 'dotenv/config';
 
 import admin from "firebase-admin";
 import fs from "fs";
@@ -188,7 +189,7 @@ async function start() {
 
 
 
-    app.listen(3001, () => console.log("Server läuft auf http://localhost:3001"));
+    app.listen(3001, () => console.log(`Server läuft auf localhost:3001`));
 }
 
 start().catch(err => console.error("Fehler beim Start:", err));

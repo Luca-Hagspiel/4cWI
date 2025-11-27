@@ -6,6 +6,9 @@ import Inputs from "./Components/Inputs.tsx";
 import axios from "axios";
 import Cookies from "universal-cookie";
 
+const VITE_MONGO_ENV = import.meta.env.VITE_MONGO_ENV;
+
+
 const cookies = new Cookies();
 
 export default function SignIn() {
@@ -32,7 +35,7 @@ export default function SignIn() {
         e.preventDefault();
 
         try {
-            const result = await axios.post('http://localhost:3001/api/login/user', formData);
+            const result = await axios.post(`${VITE_MONGO_ENV}/api/login/user`, formData);
             if (result.data.firebaseToken) {
                 await signInWithCustomToken(auth, result.data.firebaseToken);
 
@@ -97,7 +100,7 @@ export default function SignIn() {
                 </div>
             </div>
 
-            <button type="button" onClick={() => window.open("http://localhost:3001/api/users", "_blank")} className="fixed bottom-4 right-4 bg-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-green-700 transition-colors">
+            <button type="button" onClick={() => window.open(`${VITE_MONGO_ENV}/api/users`, "_blank")} className="fixed bottom-4 right-4 bg-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-green-700 transition-colors">
                 Gespeicherte Daten anzeigen
             </button>
         </>
