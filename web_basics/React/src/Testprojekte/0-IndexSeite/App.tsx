@@ -5,6 +5,8 @@ import { motion } from "framer-motion";
 const aufgaben = [
     { path: "/Testprojekte/1-SignUp", name: "SignUp" },
     { path: "/Testprojekte/2-SignUp", name: "Messenger" },
+    { path: "/Testprojekte/3-Zustand", name: "Zustand" },
+    { path: "/Testprojekte/4-ChatApp", name: "Messenger-FirebaseOnly" },
 ];
 
 const App: React.FC = () => {

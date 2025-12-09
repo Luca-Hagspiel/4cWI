@@ -11,6 +11,7 @@ import { onAuthStateChanged, signInWithCustomToken } from "firebase/auth";
 
 const cookies = new Cookies();
 
+
 function ChatApp() {
     const navigate = useNavigate();
 
@@ -19,6 +20,7 @@ function ChatApp() {
     const [room, setRoom] = useState(() => cookies.get("RoomID") || "");
     const [privateChat, setPrivateChat] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [searchUser, setSearchUser] = useState("");
 
     const [usernameList, setUsernameList] = useState<string[]>([]);
     const [ProfileSourceList, setProfileSourceList] = useState<string[]>([]);
@@ -65,7 +67,7 @@ function ChatApp() {
     useEffect(() => {
         const fetchUsers = async () => {
             try {
-                const res = await axios.get("http://localhost:3001/api/getUsers");
+                const res = await axios.get(`http://localhost:3001/api/getUsers`);
                 const users = res.data as { username: string; profilbildSource: string }[];
                 const otherUsers = users.filter(u => u.username !== username);
                 setUsernameList(otherUsers.map(u => u.username));
@@ -130,8 +132,18 @@ function ChatApp() {
             <div className="w-60 bg-gray-800 border-r border-gray-700 p-4 flex flex-col h-screen">
                 <h1 className="text-white text-center mb-4 font-semibold">Alle registrierten User</h1>
                 <div className="flex-1 overflow-y-auto mb-4">
+                    <div>
+                        <input
+                            className="w-full px-3 py-2 mb-4 bg-gray-800 text-gray-200 rounded-lg border border-gray-700 placeholder:text-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 "
+                            type="text"
+                            placeholder="Suchen"
+                            onChange={e => setSearchUser(e.target.value)}
+                        />
+                    </div>
+
                     <ul>
-                        {usernameList.map((user, idx) => (
+                        {searchUser == "" ? (
+                            usernameList.map((user, idx) => (
                             <li key={idx} className="text-gray-300 mb-3 hover:text-gray-400">
                                 <button
                                     className={"flex hover:cursor-pointer"}
@@ -141,7 +153,10 @@ function ChatApp() {
                                     <p className={"hover:border-b"}>{user}</p>
                                 </button>
                             </li>
-                        ))}
+                            )
+                        )) : null
+                        }
+
                     </ul>
                 </div>
 

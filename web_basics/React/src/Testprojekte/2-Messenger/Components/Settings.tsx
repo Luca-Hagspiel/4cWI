@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+
 //@ts-ignore
 export default function Settings({ onClose, handleLogout, username }) {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);

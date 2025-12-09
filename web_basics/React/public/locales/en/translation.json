@@ -1,0 +1,11 @@
+{
+  "login": {
+    "welcome": "Welcome",
+    "login": "Please sign in with your account",
+    "loginGoogle": "Sign in with Google"
+  },
+  "signedUpUsers": {
+    "users": "Signed Up Users"
+  },
+  "logout": "Logout"
+}

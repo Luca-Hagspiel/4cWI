@@ -1,0 +1,11 @@
+{
+  "login": {
+    "welcome": "Willkommen",
+    "login": "Bitte melden Sie sich mit Ihrem Konto an",
+    "loginGoogle": "Mit Google anmelden"
+  },
+  "signedUpUsers": {
+    "users": "Registrierte Benutzer"
+  },
+  "logout": "Abmelden"
+}

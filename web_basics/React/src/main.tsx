@@ -3,6 +3,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter } from "react-router";
 import { RouterProvider } from "react-router/dom";
+import "./i18n.ts"
 
 import App from "./Aufgabe 0 - Index-Seite/App.tsx";
 import App1 from "./Aufgabe 1 - Components/App.tsx";
@@ -16,6 +17,8 @@ import AppSignUp from "./Testprojekte/1-SignUp-Website/App.tsx";
 import SignUp from "./Testprojekte/2-Messenger/SignUp.tsx";
 import SignIn from "./Testprojekte/2-Messenger/SignIn.tsx";
 import ChatApp from "./Testprojekte/2-Messenger/ChatApp.tsx";
+import Zustand from "./Testprojekte/3-Zustand/App.tsx";
+import ChatAppFirebase from "./Testprojekte/4-Messenger-FireBaseOnly/ChatApp.tsx";
 
 
 
@@ -32,6 +35,8 @@ const router = createBrowserRouter([
     { path: "/Testprojekte/2-SignUp", element: <SignUp/> },
     { path: "/Testprojekte/2-SignIn", element: <SignIn/> },
     { path: "/Testprojekte/2-Chatapp", element: <ChatApp/> },
+    { path: "/Testprojekte/3-Zustand", element: <Zustand/> },
+    { path: "/Testprojekte/4-ChatApp", element: <ChatAppFirebase/> },
 ]);
 
 const root = document.getElementById("root");

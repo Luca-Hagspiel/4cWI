@@ -46,7 +46,7 @@ export default function SignUp() {
         const { passwortWiederholen, ...postFormData} = formData;
 
         try {
-            const result = await axios.post('http://localhost:3001/api/register/user', postFormData);
+            const result = await axios.post(`http://localhost:3001/api/register/user`, postFormData);
             console.log(result);
             alert("Benutzer erfolgreich erstellt!");
 
@@ -116,7 +116,7 @@ export default function SignUp() {
                 </div>
             </div>
 
-            <button type="button" onClick={() => window.open("http://localhost:3001/api/users", "_blank")} className="fixed bottom-4 right-4 bg-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-green-700 transition-colors">
+            <button type="button" onClick={() => window.open(`http://localhost:3001/api/users`, "_blank")} className="fixed bottom-4 right-4 bg-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-green-700 transition-colors">
                 Gespeicherte Daten anzeigen
             </button>
         </>
