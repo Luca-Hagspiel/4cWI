@@ -5,7 +5,18 @@
     "loginGoogle": "Sign in with Google"
   },
   "signedUpUsers": {
-    "users": "Signed Up Users"
+    "users": "Registered Users"
   },
-  "logout": "Logout"
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Customize your account and app preferences",
+    "account": "Account",
+    "accountInfo": "Manage your account and sign out",
+    "language": "Language",
+    "selectLanguage": "Choose your preferred language",
+    "changeLanguage": "Change Language",
+    "logout": "Log out",
+    "accountDelete": "Delete account",
+    "footer": "Settings saved"
+  }
 }

@@ -7,5 +7,16 @@
   "signedUpUsers": {
     "users": "Registrierte Benutzer"
   },
-  "logout": "Abmelden"
+  "settings": {
+    "title": "Einstellungen",
+    "subtitle": "Passe dein Konto und deine App-Einstellungen an",
+    "account": "Konto",
+    "accountInfo": "Verwalte dein Konto und melde dich ab",
+    "language": "Sprache",
+    "selectLanguage": "Wähle deine bevorzugte Sprache",
+    "changeLanguage": "Sprache ändern",
+    "logout": "Abmelden",
+    "accountDelete": "Account löschen",
+    "footer": "Einstellungen gespeichert"
+  }
 }
