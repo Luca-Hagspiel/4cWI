@@ -1,6 +1,6 @@
 import {useAuthState} from "react-firebase-hooks/auth";
 import {authMessenger} from "./Components/firebase-config";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {FiSettings} from "react-icons/fi";
 import {useTranslation} from "react-i18next";
 
@@ -20,6 +20,10 @@ const ChatApp = () => {
     const isPrivateChatOpen = usePrivateChatStore((state) => state.isPrivateChatOpen)
 
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
+    useEffect(() => {
+        console.log(user)
+    }, [user]);
 
     return (
         <div className="relative">
