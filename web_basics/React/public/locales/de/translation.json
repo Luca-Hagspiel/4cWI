@@ -18,5 +18,9 @@
     "logout": "Abmelden",
     "accountDelete": "Account löschen",
     "footer": "Einstellungen gespeichert"
+  },
+  "chat": {
+    "privateChatTitle": "Privater Chat",
+    "inputPlaceholder": "Nachricht eingeben..."
   }
 }

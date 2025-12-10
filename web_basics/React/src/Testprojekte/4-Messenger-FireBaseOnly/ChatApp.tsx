@@ -1,41 +1,46 @@
 import {useAuthState} from "react-firebase-hooks/auth";
 import {authMessenger} from "./Components/firebase-config";
-import {useAuthStore} from "./store";
-import SignIn from "./Components/SignIn.tsx";
 import {useState} from "react";
 import {FiSettings} from "react-icons/fi";
+import {useTranslation} from "react-i18next";
+
+import SignIn from "./Components/SignIn.tsx";
 import Settings from "./Components/Settings.tsx";
 import SignedUpUsers from "./Components/SignedUpUsers.tsx";
-import {useTranslation} from "react-i18next";
+import PrivateChat from "./Components/PrivateChat.tsx";
+
+import {useAuthStore, usePrivateChatStore} from "./store";
 
 const ChatApp = () => {
 
     const { t } = useTranslation();
-    const IsAuthenticated = useAuthStore((state) => state.isAuthenticated);
     const [user] = useAuthState(authMessenger);
+
+    const IsAuthenticated = useAuthStore((state) => state.isAuthenticated);
+    const isPrivateChatOpen = usePrivateChatStore((state) => state.isPrivateChatOpen)
 
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
     return (
         <div className="relative">
             {user || IsAuthenticated ? (
-                <div className="flex">
+                <div className="flex w-full h-screen">
 
                     {isSettingsOpen && (
                         <div
                             className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
                             onClick={() => setIsSettingsOpen(false)}
                         >
-                            <div
-                                onClick={(e) => e.stopPropagation()}
-                            >
+                            <div onClick={(e) => e.stopPropagation()}>
                                 <Settings onClose={() => setIsSettingsOpen(false)} />
                             </div>
                         </div>
                     )}
 
-                    <div className="w-60 bg-gray-800 border-r border-gray-700 p-4 flex flex-col h-screen">
-                        <SignedUpUsers/>
+                    {/* SIDEBAR */}
+                    <div className="w-60 bg-gray-800 border-r border-gray-700 p-4 flex flex-col">
+
+                        <SignedUpUsers />
 
                         <div className="mt-auto flex items-center justify-between px-2 border-t border-gray-700 pt-4">
                             <div className="flex-1 flex items-center">
@@ -56,9 +61,25 @@ const ChatApp = () => {
                             </button>
                         </div>
                     </div>
+
+                    {/* MAIN CONTENT AREA */}
+                    <div className="flex-1 flex bg-gray-900">
+
+                        {isPrivateChatOpen ? (
+                            <div className="flex-1">
+                                <PrivateChat />
+                            </div>
+                        ) : (
+                            <div className="flex-1 flex items-center justify-center text-gray-500">
+                                <p>Placeholder</p>
+                            </div>
+                        )}
+
+                    </div>
+
                 </div>
             ) : (
-                <SignIn/>
+                <SignIn />
             )}
         </div>
     );
