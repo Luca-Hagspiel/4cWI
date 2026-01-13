@@ -13,6 +13,21 @@ interface FirestoreUser {
     uid: string;
 }
 
+const DEFAULT_AVATAR = "https://www.gravatar.com/avatar/?d=mp";
+
+const validateImage = (url: string): Promise<string> => {
+    return new Promise((resolve) => {
+        if (!url) {
+            resolve(DEFAULT_AVATAR);
+            return;
+        }
+        const img = new Image();
+        img.onload = () => resolve(url);
+        img.onerror = () => resolve(DEFAULT_AVATAR);
+        img.src = url;
+    });
+};
+
 const SignedUpUsers = () => {
     const { t } = useTranslation();
     const [userList, setUserList] = useState<FirestoreUser[]>([]);
@@ -23,18 +38,29 @@ const SignedUpUsers = () => {
     useEffect(() => {
         const fetchData = async () => {
             const querySnapshot = await getDocs(collection(db, "user"));
-            const data: FirestoreUser[] = querySnapshot.docs.map(doc => {
+
+            const rawData = querySnapshot.docs.map(doc => {
                 const docData = doc.data() as DocumentData;
                 return {
                     id: doc.id,
-                    username: docData.username || "",
+                    username: docData.username || docData.displayName || "",
                     profilepicture: docData.profilepicture || "",
                     uid: docData.uid || ""
                 };
             });
+
+            const data: FirestoreUser[] = await Promise.all(
+                rawData.map(async (userData) => ({
+                    ...userData,
+                    profilepicture: await validateImage(userData.profilepicture)
+                }))
+            );
+
             setUserList(data
                 .filter(item => item.uid !== user?.uid)
                 .sort((a, b) => a.username.localeCompare(b.username)));
+
+            console.log(data)
         };
 
         if (user) {
@@ -60,8 +86,11 @@ const SignedUpUsers = () => {
                         >
                             <img
                                 className="w-8 h-8 rounded-full mr-3 object-cover border border-gray-600"
-                                src={list.profilepicture}
+                                src={list.profilepicture || "https://www.gravatar.com/avatar/?d=mp"}
                                 alt={list.username}
+                                onError={(e) => {
+                                    e.currentTarget.src = "https://www.gravatar.com/avatar/?d=mp";
+                                }}
                             />
                             <div className="flex flex-col">
                                 <p className="text-white font-medium text-sm">{list.username}</p>

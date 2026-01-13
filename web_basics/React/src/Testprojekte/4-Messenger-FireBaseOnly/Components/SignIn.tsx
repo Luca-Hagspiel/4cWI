@@ -17,17 +17,17 @@ const SignIn = () => {
             const result = await signInWithPopup(authMessenger, googleProviderMessenger);
             const user = result.user;
 
-            const safeDisplayName = user.displayName ? user.displayName.replace(/\s+/g, "_") : "user";
             const safeUid = user.uid.replace(/\s+/g, "");
 
-            const docId = `${safeDisplayName}_${safeUid}`;
+            const docId = `${safeUid}`;
 
             const userDocRef = doc(db, "user", docId);
             const docSnap = await getDoc(userDocRef);
 
             if (!docSnap.exists()) {
                 await setDoc(userDocRef, {
-                    username: user.displayName,
+                    displayName: user.displayName,
+                    username : null,
                     profilepicture: user.photoURL,
                     uid: user.uid,
                 });
