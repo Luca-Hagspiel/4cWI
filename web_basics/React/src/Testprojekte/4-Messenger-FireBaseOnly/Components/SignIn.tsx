@@ -26,7 +26,7 @@ const SignIn = () => {
 
             if (!docSnap.exists()) {
                 await setDoc(userDocRef, {
-                    displayName: user.displayName,
+                    displayName: null,
                     username : null,
                     profilepicture: user.photoURL,
                     uid: user.uid,
@@ -34,6 +34,7 @@ const SignIn = () => {
             }
 
             setAuthTrue();
+
         } catch (error) {
             console.error("Error signing in with Google:", error);
             setAuthFalse();

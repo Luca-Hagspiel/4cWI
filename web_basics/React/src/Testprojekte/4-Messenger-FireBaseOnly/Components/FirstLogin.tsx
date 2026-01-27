@@ -1,7 +1,7 @@
-import {doc, getDoc} from "firebase/firestore";
-import {authMessenger, db} from "./firebase-config.ts";
 import {useEffect, useState} from "react";
 import {useAuthState} from "react-firebase-hooks/auth";
+import { db, authMessenger } from './firebase-config.ts';
+import {doc, getDoc, setDoc} from "firebase/firestore";
 
 const FirstLogin = () => {
 
@@ -16,10 +16,14 @@ const FirstLogin = () => {
 
             const docRef = doc(db, "user", userUID);
             const docSnap = await getDoc(docRef);
+            const userdata = docSnap.data();
 
             if (docSnap.exists()) {
+
+
+
             } else {
-                console.log("Dokument existiert nicht");
+                console.log("Document does not exist");
             }
         }
         fetchUserData();
