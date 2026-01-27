@@ -9,6 +9,7 @@ type Person = {
 
 export default function PeopleContainer() {
     const [People, setPeople] = useState<Person[]>([]);
+    const [filter, setFilter] = useState("");
 
     useEffect(() => {
         fetch("https://6909e7791a446bb9cc208783.mockapi.io/api/Poeple/Person")
@@ -17,16 +18,26 @@ export default function PeopleContainer() {
     }, []);
 
     return (
-        <div className="grid grid-cols-4 gap-4 p-4">
-            {People.map(person => (
-                <Card
-                    name={person.name}
-                    jobtitle={person.jobtitle}
-                    image={person.avatar}
-                />
-            ))}
-        </div>
+        <>
+            <input
+                className="border p-2 m-4"
+                value={filter}
+                onChange={e => setFilter(e.target.value)}
+            />
+
+            <div className="grid grid-cols-4 gap-4 p-4">
+                {People
+                    .filter(p =>
+                        (p.name + p.jobtitle).toLowerCase().includes(filter.toLowerCase())
+                    )
+                    .map(person => (
+                        <Card
+                            name={person.name}
+                            jobtitle={person.jobtitle}
+                            image={person.avatar}
+                        />
+                    ))}
+            </div>
+        </>
     );
 }
-
-
