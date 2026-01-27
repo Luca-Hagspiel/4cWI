@@ -1,19 +1,19 @@
 import { useAuthState } from "react-firebase-hooks/auth";
-import { authMessenger } from "./Components/firebase-config";
+import { authMessenger, db } from "./Components/firebase-config";
 import { useEffect, useState } from "react";
 import { FiSettings } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
-import { useAuthStore, usePrivateChatStore } from "./store";
+import { usePrivateChatStore } from "./store";
 
 import SignIn from "./Components/SignIn";
 import Settings from "./Components/Settings";
 import SignedUpUsers from "./Components/SignedUpUsers";
 import PrivateChat from "./Components/PrivateChat";
 import FirstLogin from "./Components/FirstLogin";
+import { doc, getDoc } from "firebase/firestore";
 
 const ChatApp = () => {
     const { t } = useTranslation();
-
 
     const [user, loading] = useAuthState(authMessenger);
 
@@ -23,16 +23,32 @@ const ChatApp = () => {
 
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [hasUsername, setHasUsername] = useState(false);
+    const [isReady, setIsReady] = useState(false);
 
-
+    // 🔹 Firestore Username Check
     useEffect(() => {
-        if (!user) return;
+        const fetchUserData = async () => {
+            if (!user) {
+                setHasUsername(false);
+                setIsReady(true);
+                return;
+            }
 
-        setHasUsername(!!user.displayName);
+            try {
+                const docSnap = await getDoc(doc(db, "user", user.uid));
+                setHasUsername(!!docSnap.data()?.username);
+            } catch (err) {
+                console.error("Fehler beim Laden des Users:", err);
+                setHasUsername(false);
+            } finally {
+                setIsReady(true);
+            }
+        };
+
+        fetchUserData();
     }, [user]);
 
-
-    if (loading) {
+    if (loading || !isReady) {
         return (
             <div className="flex h-screen items-center justify-center text-white">
                 Lade...
@@ -40,17 +56,13 @@ const ChatApp = () => {
         );
     }
 
-    if (!user) {
-        return <SignIn />;
-    }
+    if (!user) return <SignIn />;
 
-    if (!hasUsername) {
-        return <FirstLogin />;
-    }
+    if (!hasUsername) return <FirstLogin />;
 
     return (
         <div className="relative flex w-full h-screen">
-
+            {/* Settings Overlay */}
             {isSettingsOpen && (
                 <div
                     className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
@@ -73,9 +85,7 @@ const ChatApp = () => {
                             src={user.photoURL || "https://www.gravatar.com/avatar/?d=mp"}
                             alt="Profilbild"
                         />
-                        <span className="text-white">
-              {user.displayName || user.email}
-            </span>
+                        <span className="text-white">{user.displayName || user.email}</span>
                     </div>
 
                     <button
