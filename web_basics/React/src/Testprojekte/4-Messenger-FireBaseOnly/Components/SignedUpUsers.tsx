@@ -8,9 +8,8 @@ import { usePrivateChatStore } from "../store.ts";
 
 interface FirestoreUser {
     id: string;
-    username: string;
+    displayName: string;
     profilepicture: string;
-    uid: string;
 }
 
 const DEFAULT_AVATAR = "https://www.gravatar.com/avatar/?d=mp";
@@ -43,9 +42,8 @@ const SignedUpUsers = () => {
                 const docData = doc.data() as DocumentData;
                 return {
                     id: doc.id,
-                    username: docData.username || docData.displayName || "",
-                    profilepicture: docData.profilepicture || "",
-                    uid: docData.uid || ""
+                    displayName: docData.displayName || docData.displayName || "",
+                    profilepicture: docData.profilepicture || ""
                 };
             });
 
@@ -57,10 +55,8 @@ const SignedUpUsers = () => {
             );
 
             setUserList(data
-                .filter(item => item.uid !== user?.uid)
-                .sort((a, b) => a.username.localeCompare(b.username)));
-
-            console.log(data)
+                .filter(item => item.id !== user?.uid)
+                .sort((a, b) => a.displayName.localeCompare(b.displayName)));
         };
 
         if (user) {
@@ -81,19 +77,19 @@ const SignedUpUsers = () => {
                         className="mt-2 flex items-center pl-2 rounded"
                     >
                         <button
-                            onClick={() => openPrivateChat(list.uid, user?.uid || "")}
+                            onClick={() => openPrivateChat(list.id, user?.uid || "")}
                             className={"flex items-center w-full text-left hover:bg-gray-700 p-2 rounded"}
                         >
                             <img
                                 className="w-8 h-8 rounded-full mr-3 object-cover border border-gray-600"
-                                src={list.profilepicture || "https://www.gravatar.com/avatar/?d=mp"}
-                                alt={list.username}
+                                src={list.profilepicture || DEFAULT_AVATAR}
+                                alt={list.displayName}
                                 onError={(e) => {
-                                    e.currentTarget.src = "https://www.gravatar.com/avatar/?d=mp";
+                                    e.currentTarget.src = DEFAULT_AVATAR;
                                 }}
                             />
                             <div className="flex flex-col">
-                                <p className="text-white font-medium text-sm">{list.username}</p>
+                                <p className="text-white font-medium text-sm">{list.displayName}</p>
                             </div>
                         </button>
                     </li>

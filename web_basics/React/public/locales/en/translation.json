@@ -4,6 +4,13 @@
     "login": "Please sign in with your account",
     "loginGoogle": "Sign in with Google"
   },
+  "firstlogin": {
+    "welcome": "Welcome",
+    "username": "Username",
+    "save": "Save",
+    "errorIncomplete": "Please fill in both fields correctly.",
+    "errorTaken": "This username is already taken."
+  },
   "signedUpUsers": {
     "users": "Registered Users"
   },

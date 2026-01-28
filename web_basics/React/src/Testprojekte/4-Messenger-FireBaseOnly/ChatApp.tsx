@@ -24,8 +24,10 @@ const ChatApp = () => {
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [hasUsername, setHasUsername] = useState(false);
     const [isReady, setIsReady] = useState(false);
+    const [firestoreDisplayName, setFirestoreDisplayName] = useState<string | null>(null);
+    const [firestoreUID, setFirestoreUID] = useState<string | null>(null);
 
-    // 🔹 Firestore Username Check
+
     useEffect(() => {
         const fetchUserData = async () => {
             if (!user) {
@@ -36,10 +38,17 @@ const ChatApp = () => {
 
             try {
                 const docSnap = await getDoc(doc(db, "user", user.uid));
-                setHasUsername(!!docSnap.data()?.username);
+                const data = docSnap.data();
+                if (data?.username != null) {
+                    setHasUsername(true);
+                    setFirestoreDisplayName(data.displayName || data.username || null);
+                    setFirestoreUID(data.uid || null);
+                }
             } catch (err) {
                 console.error("Fehler beim Laden des Users:", err);
                 setHasUsername(false);
+                setFirestoreDisplayName(null);
+                setFirestoreUID(null);
             } finally {
                 setIsReady(true);
             }
@@ -51,7 +60,7 @@ const ChatApp = () => {
     if (loading || !isReady) {
         return (
             <div className="flex h-screen items-center justify-center text-white">
-                Lade...
+                Loading...
             </div>
         );
     }
@@ -62,7 +71,6 @@ const ChatApp = () => {
 
     return (
         <div className="relative flex w-full h-screen">
-            {/* Settings Overlay */}
             {isSettingsOpen && (
                 <div
                     className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
@@ -74,7 +82,6 @@ const ChatApp = () => {
                 </div>
             )}
 
-            {/* SIDEBAR */}
             <div className="w-60 bg-gray-800 border-r border-gray-700 p-4 flex flex-col">
                 <SignedUpUsers />
 
@@ -85,7 +92,8 @@ const ChatApp = () => {
                             src={user.photoURL || "https://www.gravatar.com/avatar/?d=mp"}
                             alt="Profilbild"
                         />
-                        <span className="text-white">{user.displayName || user.email}</span>
+                        <span className="text-white">{firestoreDisplayName} </span>
+                        <span className="text-gray-400">#{firestoreUID}</span>
                     </div>
 
                     <button
@@ -98,7 +106,6 @@ const ChatApp = () => {
                 </div>
             </div>
 
-            {/* MAIN CONTENT */}
             <div className="flex-1 bg-gray-900">
                 {isPrivateChatOpen ? (
                     <PrivateChat />

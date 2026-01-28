@@ -4,6 +4,13 @@
     "login": "Bitte melden Sie sich mit Ihrem Konto an",
     "loginGoogle": "Mit Google anmelden"
   },
+  "firstlogin": {
+    "welcome": "Willkommen",
+    "username": "Benutzername",
+    "save": "Speichern",
+    "errorIncomplete": "Bitte füllen Sie beide Felder korrekt aus.",
+    "errorTaken": "Dieser Benutzername ist bereits vergeben."
+  },
   "signedUpUsers": {
     "users": "Registrierte Benutzer"
   },

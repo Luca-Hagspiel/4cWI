@@ -31,6 +31,10 @@ const SignIn = () => {
                     profilepicture: user.photoURL,
                     uid: user.uid,
                 });
+            } else {
+                await setDoc(userDocRef, {
+                    profilepicture: user.photoURL,
+                }, { merge: true });
             }
 
             setAuthTrue();
