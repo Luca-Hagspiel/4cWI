@@ -3,13 +3,15 @@ import { authMessenger, db } from "./Components/firebase-config";
 import { useEffect, useState } from "react";
 import { FiSettings } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
-import { usePrivateChatStore } from "./store";
+import { usePrivateChatStore, useOpenUserInterfaceStore } from "./store";
 
 import SignIn from "./Components/SignIn";
 import Settings from "./Components/Settings";
 import SignedUpUsers from "./Components/SignedUpUsers";
 import PrivateChat from "./Components/PrivateChat";
 import FirstLogin from "./Components/FirstLogin";
+import OpenUserInterface from "./Components/OpenUserInterface";
+
 import { doc, getDoc } from "firebase/firestore";
 
 const ChatApp = () => {
@@ -21,12 +23,18 @@ const ChatApp = () => {
         (state) => state.isPrivateChatOpen
     );
 
+    const isOpenUIVisible = useOpenUserInterfaceStore(
+        (state) => state.isOpenUIVisible
+    );
+
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [hasUsername, setHasUsername] = useState(false);
     const [isReady, setIsReady] = useState(false);
-    const [firestoreDisplayName, setFirestoreDisplayName] = useState<string | null>(null);
-    const [firestoreUID, setFirestoreUID] = useState<string | null>(null);
 
+    const [firestoreDisplayName, setFirestoreDisplayName] =
+        useState<string | null>(null);
+    const [firestoreUID, setFirestoreUID] =
+        useState<string | null>(null);
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -39,9 +47,12 @@ const ChatApp = () => {
             try {
                 const docSnap = await getDoc(doc(db, "user", user.uid));
                 const data = docSnap.data();
-                if (data?.username != null) {
+
+                if (data?.username) {
                     setHasUsername(true);
-                    setFirestoreDisplayName(data.displayName || data.username || null);
+                    setFirestoreDisplayName(
+                        data.displayName || data.username || null
+                    );
                     setFirestoreUID(data.uid || null);
                 }
             } catch (err) {
@@ -57,6 +68,7 @@ const ChatApp = () => {
         fetchUserData();
     }, [user]);
 
+    /* ---------- LOADING ---------- */
     if (loading || !isReady) {
         return (
             <div className="flex h-screen items-center justify-center text-white">
@@ -65,10 +77,15 @@ const ChatApp = () => {
         );
     }
 
+    /* ---------- AUTH ---------- */
     if (!user) return <SignIn />;
-
     if (!hasUsername) return <FirstLogin />;
 
+    /* ---------- UI OVERLAY ---------- */
+
+    if (isOpenUIVisible) return <OpenUserInterface />;
+
+    /* ---------- MAIN APP ---------- */
     return (
         <div className="relative flex w-full h-screen">
             {isSettingsOpen && (
@@ -82,18 +99,24 @@ const ChatApp = () => {
                 </div>
             )}
 
+            {/* Sidebar */}
             <div className="w-60 bg-gray-800 border-r border-gray-700 p-4 flex flex-col">
                 <SignedUpUsers />
 
                 <div className="mt-auto flex items-center justify-between px-2 border-t border-gray-700 pt-4">
-                    <div className="flex-1 flex items-center">
+                    <div className="flex-1 flex items-center overflow-hidden">
                         <img
                             className="size-10 rounded-full mr-3"
-                            src={user.photoURL || "https://www.gravatar.com/avatar/?d=mp"}
+                            src={
+                                user.photoURL ||
+                                "https://www.gravatar.com/avatar/?d=mp"
+                            }
                             alt="Profilbild"
                         />
-                        <span className="text-white">{firestoreDisplayName} </span>
-                        <span className="text-gray-400">#{firestoreUID}</span>
+                        <div className="truncate">
+                            <span className="text-white">{firestoreDisplayName}</span>
+                            <span className="text-gray-400">#{firestoreUID}</span>
+                        </div>
                     </div>
 
                     <button
@@ -106,6 +129,7 @@ const ChatApp = () => {
                 </div>
             </div>
 
+            {/* Chat */}
             <div className="flex-1 bg-gray-900">
                 {isPrivateChatOpen ? (
                     <PrivateChat />

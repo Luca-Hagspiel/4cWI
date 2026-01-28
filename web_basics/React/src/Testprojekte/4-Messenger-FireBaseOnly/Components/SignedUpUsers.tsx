@@ -4,7 +4,7 @@ import { authMessenger, db } from "./firebase-config.ts";
 import { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 
-import { usePrivateChatStore } from "../store.ts";
+import { useOpenUserInterfaceStore } from "../store.ts";
 
 interface FirestoreUser {
     id: string;
@@ -14,60 +14,62 @@ interface FirestoreUser {
 
 const DEFAULT_AVATAR = "https://www.gravatar.com/avatar/?d=mp";
 
-const validateImage = (url: string): Promise<string> => {
-    return new Promise((resolve) => {
-        if (!url) {
-            resolve(DEFAULT_AVATAR);
-            return;
-        }
+const validateImage = (url: string): Promise<string> =>
+    new Promise((resolve) => {
+        if (!url) return resolve(DEFAULT_AVATAR);
         const img = new Image();
         img.onload = () => resolve(url);
         img.onerror = () => resolve(DEFAULT_AVATAR);
         img.src = url;
     });
-};
 
 const SignedUpUsers = () => {
     const { t } = useTranslation();
     const [userList, setUserList] = useState<FirestoreUser[]>([]);
     const [user] = useAuthState(authMessenger);
 
-    const openPrivateChat = usePrivateChatStore((state) => state.openPrivateChat);
+    const showOpenUI = useOpenUserInterfaceStore(
+        (state) => state.showOpenUI
+    );
 
     useEffect(() => {
+        if (!user) return;
+
         const fetchData = async () => {
             const querySnapshot = await getDocs(collection(db, "user"));
 
-            const rawData = querySnapshot.docs.map(doc => {
+            const rawData = querySnapshot.docs.map((doc) => {
                 const docData = doc.data() as DocumentData;
                 return {
                     id: doc.id,
-                    displayName: docData.displayName || docData.displayName || "",
-                    profilepicture: docData.profilepicture || ""
+                    displayName: docData.displayName ?? "",
+                    profilepicture: docData.profilepicture ?? "",
                 };
             });
 
             const data: FirestoreUser[] = await Promise.all(
-                rawData.map(async (userData) => ({
-                    ...userData,
-                    profilepicture: await validateImage(userData.profilepicture)
+                rawData.map(async (u) => ({
+                    ...u,
+                    profilepicture: await validateImage(u.profilepicture),
                 }))
             );
 
-            setUserList(data
-                .filter(item => item.id !== user?.uid)
-                .sort((a, b) => a.displayName.localeCompare(b.displayName)));
+            setUserList(
+                data
+                    .filter((u) => u.id !== user.uid)
+                    .sort((a, b) =>
+                        a.displayName.localeCompare(b.displayName)
+                    )
+            );
         };
 
-        if (user) {
-            fetchData().catch(console.error);
-        }
+        fetchData().catch(console.error);
     }, [user]);
 
     return (
         <div className="text-white">
             <h1 className="items-center flex flex-col border-b border-gray-700 py-2">
-                {t('signedUpUsers.users')}
+                {t("signedUpUsers.users")}
             </h1>
 
             <ul>
@@ -77,20 +79,22 @@ const SignedUpUsers = () => {
                         className="mt-2 flex items-center pl-2 rounded"
                     >
                         <button
-                            onClick={() => openPrivateChat(list.id, user?.uid || "")}
-                            className={"flex items-center w-full text-left hover:bg-gray-700 p-2 rounded"}
+                            onClick={() => {
+                                showOpenUI();
+                            }}
+                            className="flex items-center w-full text-left hover:bg-gray-700 p-2 rounded"
                         >
-                            <img
+                        <img
                                 className="w-8 h-8 rounded-full mr-3 object-cover border border-gray-600"
-                                src={list.profilepicture || DEFAULT_AVATAR}
+                                src={list.profilepicture}
                                 alt={list.displayName}
-                                onError={(e) => {
-                                    e.currentTarget.src = DEFAULT_AVATAR;
-                                }}
+                                onError={(e) =>
+                                    (e.currentTarget.src = DEFAULT_AVATAR)
+                                }
                             />
-                            <div className="flex flex-col">
-                                <p className="text-white font-medium text-sm">{list.displayName}</p>
-                            </div>
+                            <p className="text-white font-medium text-sm">
+                                {list.displayName}
+                            </p>
                         </button>
                     </li>
                 ))}

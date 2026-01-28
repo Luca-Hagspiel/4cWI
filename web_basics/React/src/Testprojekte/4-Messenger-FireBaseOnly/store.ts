@@ -13,6 +13,18 @@ type PrivateChatStore = {
     openPrivateChat: (user1:string, user2:string) => void;
 }
 
+type OpenUserInterfaceStore = {
+    isOpenUIVisible: boolean;
+    showOpenUI: () => void;
+    hideOpenUI: () => void;
+}
+
+export const useOpenUserInterfaceStore = create<OpenUserInterfaceStore>((set) => ({
+    isOpenUIVisible: false,
+    showOpenUI: () => set({ isOpenUIVisible: true }),
+    hideOpenUI: () => set({ isOpenUIVisible: false }),
+}));
+
 export const useAuthStore = create<AuthStore>((set) => ({
     isAuthenticated: false,
     setAuthTrue: () => set({ isAuthenticated: true }),
