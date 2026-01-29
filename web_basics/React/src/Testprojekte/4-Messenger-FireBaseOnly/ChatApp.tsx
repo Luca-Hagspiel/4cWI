@@ -27,6 +27,10 @@ const ChatApp = () => {
         (state) => state.isOpenUIVisible
     );
 
+    const userChatData = useOpenUserInterfaceStore(
+        (state) => state.userChatData
+    );
+
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [hasUsername, setHasUsername] = useState(false);
     const [isReady, setIsReady] = useState(false);
@@ -81,13 +85,13 @@ const ChatApp = () => {
     if (!user) return <SignIn />;
     if (!hasUsername) return <FirstLogin />;
 
-    /* ---------- UI OVERLAY ---------- */
-
-    if (isOpenUIVisible) return <OpenUserInterface />;
-
     /* ---------- MAIN APP ---------- */
     return (
         <div className="relative flex w-full h-screen">
+            {/* SCHWEBENDES OPEN USER INTERFACE */}
+            {isOpenUIVisible && <OpenUserInterface userData={userChatData} />}
+
+            {/* SETTINGS OVERLAY */}
             {isSettingsOpen && (
                 <div
                     className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
@@ -107,10 +111,7 @@ const ChatApp = () => {
                     <div className="flex-1 flex items-center overflow-hidden">
                         <img
                             className="size-10 rounded-full mr-3"
-                            src={
-                                user.photoURL ||
-                                "https://www.gravatar.com/avatar/?d=mp"
-                            }
+                            src={user.photoURL || "https://www.gravatar.com/avatar/?d=mp"}
                             alt="Profilbild"
                         />
                         <div className="truncate">
