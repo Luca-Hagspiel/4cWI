@@ -17,8 +17,8 @@ type OpenUserInterfaceStore = {
     isOpenUIVisible: boolean;
     showOpenUI: () => void;
     hideOpenUI: () => void;
-    userChatData: [] | null;
-    setChatUserData: (data: []) => void;
+    userChatData: unknown | null;
+    setChatUserData: (data: unknown) => void;
 };
 
 export const useOpenUserInterfaceStore = create<OpenUserInterfaceStore>((set) => ({
@@ -26,7 +26,7 @@ export const useOpenUserInterfaceStore = create<OpenUserInterfaceStore>((set) =>
     userChatData: null,
     showOpenUI: () => set({ isOpenUIVisible: true }),
     hideOpenUI: () => set({ isOpenUIVisible: false }),
-    setChatUserData: (data: []) => set({ userChatData: data }),
+    setChatUserData: (data: unknown) => set({ userChatData: data }),
 }));
 
 export const useAuthStore = create<AuthStore>((set) => ({

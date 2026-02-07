@@ -1,19 +1,20 @@
 import {useOpenUserInterfaceStore, usePrivateChatStore} from "../store";
 import {FiUserPlus, FiX} from "react-icons/fi";
+import useGetStatusLastSeen from "../Hooks/useGetStatusLastSeen.ts";
 
 type UserPreview = {
     id: string;
-    name: string;
+    displayName: string;
     username: string;
-    avatarUrl?: string;
+    profilepicture?: string;
     status?: "online" | "offline";
     bio?: string;
     mutualFriends?: number;
-    joined?: string;
+    createdAt?: string;
 };
 
 type Props = {
-    userData: [];
+    userData: UserPreview;
 };
 
 
@@ -21,15 +22,21 @@ const OpenUserInterface = ({ userData }: Props) => {
     const openPrivateChat = usePrivateChatStore((state) => state.openPrivateChat);
     const hideOpenUI = useOpenUserInterfaceStore((state) => state.hideOpenUI);
 
+    const formatDate = (d?: Date) => {
+        if (!d) return undefined;
+        return d.toLocaleDateString("de-DE");
+    };
+
     const u: UserPreview = {
-        id: "USER_1",
-        name: "Max Mustermann",
-        username: "max.must",
-        avatarUrl: undefined,
-        status: "online",
+        id: userData.id,
+        displayName: userData.displayName,
+        username: userData.username,
+        profilepicture: userData.profilepicture,
+        status: useGetStatusLastSeen(userData.id),
         bio: "Frontend Developer • React & TypeScript • Kaffeeliebhaber",
-        mutualFriends: 5,
-        joined: "2022-01-15",
+        mutualFriends: 0,
+        // @ts-ignore
+        createdAt: formatDate(userData.createdAt),
     };
 
     const statusColor =
@@ -42,16 +49,14 @@ const OpenUserInterface = ({ userData }: Props) => {
             <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none px-4">
                 <div className="bg-gray-800/90 text-white rounded-2xl shadow-2xl w-full max-w-4xl p-6 pointer-events-auto relative">
                     <div className="flex gap-6">
-                        {/* Linke Spalte: Profilbild */}
                         <div className="flex-shrink-0">
                             <div className="w-36 h-36 rounded-xl overflow-hidden bg-gray-700 flex items-center justify-center">
-                                {u.avatarUrl ? (
-                                        //eslint-disable-next-line @next/next/no-img-element
-                                    <img src={u.avatarUrl} alt={u.name} className="w-full h-full object-cover" />
+                                {u.profilepicture ? (
+                                    <img src={u.profilepicture} alt={u.displayName} className="w-full h-full object-cover" />
                                 ) : (
                                     <div className="w-full h-full flex flex-col items-center justify-center text-gray-200">
                                         <span className="text-2xl font-semibold">
-                                            {u.name.split(" ").map(n => n[0]).slice(0,2).join("")}
+                                            {u.displayName}
                                         </span>
                                         <span className="text-xs mt-1 text-gray-300">Profilbild</span>
                                     </div>
@@ -65,11 +70,10 @@ const OpenUserInterface = ({ userData }: Props) => {
                             </div>
                         </div>
 
-                        {/* Rechte Spalte: Details & Aktionen */}
                         <div className="flex-1">
                             <div className="flex items-start justify-between">
                                 <div>
-                                    <h2 className="text-2xl font-bold">{u.name}</h2>
+                                    <h2 className="text-2xl font-bold">{u.displayName}</h2>
                                     <p className="text-sm text-gray-300">@{u.username}</p>
                                 </div>
 
@@ -100,7 +104,7 @@ const OpenUserInterface = ({ userData }: Props) => {
                                 </div>
                                 <div className="bg-gray-800/60 p-3 rounded-lg text-center">
                                     <div className="text-xs text-gray-400">Beigetreten</div>
-                                    <div className="font-semibold text-lg">{u.joined}</div>
+                                    <div className="font-semibold text-lg">{u.createdAt}</div>
                                 </div>
                                 <div className="bg-gray-800/60 p-3 rounded-lg text-center">
                                     <div className="text-xs text-gray-400">Status</div>
@@ -108,15 +112,6 @@ const OpenUserInterface = ({ userData }: Props) => {
                                 </div>
                             </div>
 
-                            <div className="mt-6">
-                                <h3 className="text-sm text-gray-400 mb-2">Gemeinsame Freunde</h3>
-                                <div className="flex items-center gap-2">
-                                    <div className="w-10 h-10 rounded-full bg-gray-700" />
-                                    <div className="w-10 h-10 rounded-full bg-gray-700" />
-                                    <div className="w-10 h-10 rounded-full bg-gray-700" />
-                                    <div className="text-sm text-gray-300 ml-2">+{Math.max(0, (u.mutualFriends ?? 0) - 3)} weitere</div>
-                                </div>
-                            </div>
 
                             <div className="mt-6 flex items-center gap-3">
                                 <button

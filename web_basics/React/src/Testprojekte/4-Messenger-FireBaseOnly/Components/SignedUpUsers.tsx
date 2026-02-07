@@ -83,7 +83,7 @@ const SignedUpUsers = () => {
                     >
                         <button
                             onClick={() => {
-                                setChatUserData(list); // passt jetzt zum Interface
+                                setChatUserData(list);
                                 showOpenUI();
                             }}
                             className="flex items-center w-full text-left hover:bg-gray-700 p-2 rounded"

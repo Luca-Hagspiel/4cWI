@@ -45,6 +45,7 @@ const FirstLogin = () => {
             userRef,
             {
                 username: uniqueName,
+                usernameID: uid,
                 displayName: username,
                 firstLoginCompleted: true,
                 createdAt: serverTimestamp(),

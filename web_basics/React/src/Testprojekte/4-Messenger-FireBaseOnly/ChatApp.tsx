@@ -13,32 +13,37 @@ import FirstLogin from "./Components/FirstLogin";
 import OpenUserInterface from "./Components/OpenUserInterface";
 
 import { doc, getDoc } from "firebase/firestore";
+import useSetLastSeen from "./Hooks/useSetLastSeen.ts";
 
 const ChatApp = () => {
     const { t } = useTranslation();
 
     const [user, loading] = useAuthState(authMessenger);
 
-    const isPrivateChatOpen = usePrivateChatStore(
-        (state) => state.isPrivateChatOpen
-    );
-
-    const isOpenUIVisible = useOpenUserInterfaceStore(
-        (state) => state.isOpenUIVisible
-    );
-
-    const userChatData = useOpenUserInterfaceStore(
-        (state) => state.userChatData
-    );
+    const isPrivateChatOpen = usePrivateChatStore((state) => state.isPrivateChatOpen);
+    const isOpenUIVisible = useOpenUserInterfaceStore((state) => state.isOpenUIVisible);
+    const userChatData = useOpenUserInterfaceStore((state) => state.userChatData);
 
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [hasUsername, setHasUsername] = useState(false);
     const [isReady, setIsReady] = useState(false);
 
-    const [firestoreDisplayName, setFirestoreDisplayName] =
-        useState<string | null>(null);
-    const [firestoreUID, setFirestoreUID] =
-        useState<string | null>(null);
+    useSetLastSeen(user, isReady, hasUsername);
+
+    type UserDoc = {
+        firstLoginCompleted?: boolean;
+        uid?: string;
+        displayName?: string;
+        username?: string;
+        usernameID?: string;
+        profilepicture?: string;
+    };
+
+    const [data, setData] = useState<UserDoc | null>(null);
+
+
+    const DEFAULT_AVATAR = "https://www.gravatar.com/avatar/?d=mp";
+    const safeUserChatData = userChatData ?? [];
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -50,20 +55,15 @@ const ChatApp = () => {
 
             try {
                 const docSnap = await getDoc(doc(db, "user", user.uid));
-                const data = docSnap.data();
+                const data = docSnap.data() as UserDoc | undefined;
 
                 if (data?.username) {
                     setHasUsername(true);
-                    setFirestoreDisplayName(
-                        data.displayName || data.username || null
-                    );
-                    setFirestoreUID(data.uid || null);
+                    setData(data);
                 }
             } catch (err) {
                 console.error("Fehler beim Laden des Users:", err);
                 setHasUsername(false);
-                setFirestoreDisplayName(null);
-                setFirestoreUID(null);
             } finally {
                 setIsReady(true);
             }
@@ -85,11 +85,12 @@ const ChatApp = () => {
     if (!user) return <SignIn />;
     if (!hasUsername) return <FirstLogin />;
 
+
     /* ---------- MAIN APP ---------- */
     return (
         <div className="relative flex w-full h-screen">
-            {/* SCHWEBENDES OPEN USER INTERFACE */}
-            {isOpenUIVisible && <OpenUserInterface userData={userChatData} />}
+            {/* OPEN USER INTERFACE */}
+            {isOpenUIVisible && <OpenUserInterface userData={safeUserChatData} />}
 
             {/* SETTINGS OVERLAY */}
             {isSettingsOpen && (
@@ -111,12 +112,12 @@ const ChatApp = () => {
                     <div className="flex-1 flex items-center overflow-hidden">
                         <img
                             className="size-10 rounded-full mr-3"
-                            src={user.photoURL || "https://www.gravatar.com/avatar/?d=mp"}
+                            src={data?.profilepicture || DEFAULT_AVATAR}
                             alt="Profilbild"
                         />
                         <div className="truncate">
-                            <span className="text-white">{firestoreDisplayName}</span>
-                            <span className="text-gray-400">#{firestoreUID}</span>
+                            <span className="text-white">{data?.displayName ?? ""}</span>
+                            <span className="text-gray-500">#{data?.username?.split("#")[1] ?? ""}</span>
                         </div>
                     </div>
 
@@ -136,7 +137,7 @@ const ChatApp = () => {
                     <PrivateChat />
                 ) : (
                     <div className="flex h-full items-center justify-center text-gray-500">
-                        <p>Placeholder</p>
+                        <button onClick={() => console.log(data)}>Placeholder</button>
                     </div>
                 )}
             </div>
@@ -145,3 +146,4 @@ const ChatApp = () => {
 };
 
 export default ChatApp;
+
