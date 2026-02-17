@@ -2,7 +2,7 @@ import {useOpenUserInterfaceStore, usePrivateChatStore} from "../store";
 import {FiUserPlus, FiX} from "react-icons/fi";
 import useGetStatusLastSeen from "../Hooks/useGetStatusLastSeen.ts";
 
-type UserPreview = {
+export type UserPreview = {
     id: string;
     displayName: string;
     username: string;
@@ -74,7 +74,7 @@ const OpenUserInterface = ({ userData }: Props) => {
                             <div className="flex items-start justify-between">
                                 <div>
                                     <h2 className="text-2xl font-bold">{u.displayName}</h2>
-                                    <p className="text-sm text-gray-300">@{u.username}</p>
+                                    <p className="text-sm text-gray-400">{u.username}</p>
                                 </div>
 
                                 <div className="flex items-center gap-2">
